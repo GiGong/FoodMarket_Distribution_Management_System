@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{F2880158-B4E0-4D40-813B-71099D99D97D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{8C470F66-CBD2-437D-AC92-8CD6E7907E85}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Services", "FoodMarketDMS\Services\FoodMarketDMS.Services\FoodMarketDMS.Services.csproj", "{36F3899D-32FE-4CC9-BF00-F68CA5DD8F73}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Services.Interfaces", "FoodMarketDMS\Services\FoodMarketDMS.Services.Interfaces\FoodMarketDMS.Services.Interfaces.csproj", "{A5BB89B6-5066-4843-9392-8D5BED192C6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS", "FoodMarketDMS\FoodMarketDMS\FoodMarketDMS.csproj", "{9C9579B5-9755-4C7B-9A64-EFD39D2F2FEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Core", "FoodMarketDMS\FoodMarketDMS.Core\FoodMarketDMS.Core.csproj", "{B0350D3B-28D9-489A-B96F-F8C4399694B0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Business", "FoodMarketDMS\FoodMarketDMS.Business\FoodMarketDMS.Business.csproj", "{D8040D6B-3C23-40AD-80A6-C28CCC441E86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Modules.User", "FoodMarketDMS\Modules\FoodMarketDMS.Modules.User\FoodMarketDMS.Modules.User.csproj", "{99D96CB0-9247-4171-9E9B-E6228B9C3D16}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Modules.Offer", "FoodMarketDMS\Modules\FoodMarketDMS.Modules.Offer\FoodMarketDMS.Modules.Offer.csproj", "{8D181D68-D448-4ECF-9F75-E64C6050699F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodMarketDMS.Modules.Service", "FoodMarketDMS\Modules\FoodMarketDMS.Modules.Service\FoodMarketDMS.Modules.Service.csproj", "{A8F3E036-6572-48E7-912E-D35425A7B6D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36F3899D-32FE-4CC9-BF00-F68CA5DD8F73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F3899D-32FE-4CC9-BF00-F68CA5DD8F73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F3899D-32FE-4CC9-BF00-F68CA5DD8F73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F3899D-32FE-4CC9-BF00-F68CA5DD8F73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5BB89B6-5066-4843-9392-8D5BED192C6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5BB89B6-5066-4843-9392-8D5BED192C6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5BB89B6-5066-4843-9392-8D5BED192C6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5BB89B6-5066-4843-9392-8D5BED192C6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C9579B5-9755-4C7B-9A64-EFD39D2F2FEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C9579B5-9755-4C7B-9A64-EFD39D2F2FEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C9579B5-9755-4C7B-9A64-EFD39D2F2FEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C9579B5-9755-4C7B-9A64-EFD39D2F2FEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0350D3B-28D9-489A-B96F-F8C4399694B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0350D3B-28D9-489A-B96F-F8C4399694B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0350D3B-28D9-489A-B96F-F8C4399694B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0350D3B-28D9-489A-B96F-F8C4399694B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8040D6B-3C23-40AD-80A6-C28CCC441E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8040D6B-3C23-40AD-80A6-C28CCC441E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8040D6B-3C23-40AD-80A6-C28CCC441E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8040D6B-3C23-40AD-80A6-C28CCC441E86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D96CB0-9247-4171-9E9B-E6228B9C3D16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D96CB0-9247-4171-9E9B-E6228B9C3D16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D96CB0-9247-4171-9E9B-E6228B9C3D16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D96CB0-9247-4171-9E9B-E6228B9C3D16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D181D68-D448-4ECF-9F75-E64C6050699F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D181D68-D448-4ECF-9F75-E64C6050699F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D181D68-D448-4ECF-9F75-E64C6050699F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D181D68-D448-4ECF-9F75-E64C6050699F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8F3E036-6572-48E7-912E-D35425A7B6D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F3E036-6572-48E7-912E-D35425A7B6D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F3E036-6572-48E7-912E-D35425A7B6D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F3E036-6572-48E7-912E-D35425A7B6D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{36F3899D-32FE-4CC9-BF00-F68CA5DD8F73} = {8C470F66-CBD2-437D-AC92-8CD6E7907E85}
+		{A5BB89B6-5066-4843-9392-8D5BED192C6E} = {8C470F66-CBD2-437D-AC92-8CD6E7907E85}
+		{99D96CB0-9247-4171-9E9B-E6228B9C3D16} = {F2880158-B4E0-4D40-813B-71099D99D97D}
+		{8D181D68-D448-4ECF-9F75-E64C6050699F} = {F2880158-B4E0-4D40-813B-71099D99D97D}
+		{A8F3E036-6572-48E7-912E-D35425A7B6D9} = {F2880158-B4E0-4D40-813B-71099D99D97D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {35B250A1-B069-4E0D-B911-0A28DEBD83B8}
+	EndGlobalSection
+EndGlobal

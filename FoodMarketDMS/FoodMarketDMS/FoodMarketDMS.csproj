@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>FoodMarketDMS</AssemblyName>
+    <PackageId>FoodMarket_DMS</PackageId>
+    <Authors>YoungWoo Cho</Authors>
+    <Company>Cho</Company>
+    <Product>FoodMarket DMS</Product>
+    <NeutralLanguage>KO-KR</NeutralLanguage>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoodMarketDMS.Core\FoodMarketDMS.Core.csproj" />
+    <ProjectReference Include="..\Modules\FoodMarketDMS.Modules.Offer\FoodMarketDMS.Modules.Offer.csproj" />
+    <ProjectReference Include="..\Modules\FoodMarketDMS.Modules.Service\FoodMarketDMS.Modules.Service.csproj" />
+    <ProjectReference Include="..\Modules\FoodMarketDMS.Modules.User\FoodMarketDMS.Modules.User.csproj" />
+    <ProjectReference Include="..\Services\FoodMarketDMS.Services.Interfaces\FoodMarketDMS.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\Services\FoodMarketDMS.Services\FoodMarketDMS.Services.csproj" />
+  </ItemGroup>
+</Project>

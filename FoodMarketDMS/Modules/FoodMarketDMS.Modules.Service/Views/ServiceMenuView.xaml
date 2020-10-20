@@ -1,0 +1,9 @@
+﻿<UserControl x:Class="FoodMarketDMS.Modules.Service.Views.ServiceMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+        <!--<Button Content="" Command="{Binding ApplicationCommands.}"/>-->
+    </StackPanel>
+</UserControl>
