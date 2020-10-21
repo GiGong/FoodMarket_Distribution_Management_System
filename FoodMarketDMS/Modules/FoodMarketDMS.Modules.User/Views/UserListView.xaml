@@ -6,7 +6,7 @@
     <Grid>
         <!-- maybe use clipboard helper
         https://stackoverflow.com/questions/4118617/wpf-datagrid-pasting-->
-        <DataGrid ItemsSource="{Binding UserList}" Grid.Row="1"
+        <DataGrid IsEnabled="{Binding IsEnableGrid}" ItemsSource="{Binding UserList}" Grid.Row="1"
                   AutoGenerateColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="이름" Width="75" Binding="{Binding Name}"/>

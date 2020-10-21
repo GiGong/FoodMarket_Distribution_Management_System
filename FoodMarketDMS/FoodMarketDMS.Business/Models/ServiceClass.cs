@@ -3,10 +3,18 @@ using System.Collections.Generic;
 
 namespace FoodMarketDMS.Business.Models
 {
-    public class Service : BusinessBase
+    public class ServiceClass : BusinessBase
     {
         private DateTime _date;
         private List<string> _products;
+
+        public ServiceClass() { }
+
+        public ServiceClass(DateTime date, List<string> products)
+        {
+            Date = date;
+            Products = products;
+        }
 
         public DateTime Date
         {

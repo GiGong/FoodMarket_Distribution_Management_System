@@ -7,21 +7,31 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace FoodMarketDMS.Modules.User.ViewModels
 {
     public class UserListViewVM : NavigationViewModelBase
     {
-        private ObservableCollection<Person> _userList;
+        private bool _isEnableGrid;
+        private ObservableCollection<UserClass> _userList;
 
         private DelegateCommand _loadUserListCommand;
 
         private readonly IFileService _fileService;
         private readonly IExcelService _excelService;
 
-        public ObservableCollection<Person> UserList
+        public bool IsEnableGrid
+        {
+            get { return _isEnableGrid; }
+            set { SetProperty(ref _isEnableGrid, value); }
+        }
+
+        public ObservableCollection<UserClass> UserList
         {
             get { return _userList; }
             set { SetProperty(ref _userList, value); }
@@ -42,18 +52,27 @@ namespace FoodMarketDMS.Modules.User.ViewModels
         private void ExecuteLoadUserListCommand()
         {
             string excelPath = _fileService.OpenFilePath(IExcelService.EXCEL_FILE_EXT, (string)Application.Current.Resources["Program_Name"]);
-            var excelData = _excelService.GetExcelData(excelPath, typeof(Person).GetProperties().Count());
+            var excelData = _excelService.GetExcelData(excelPath, typeof(UserClass).GetProperties().Count());
             if (excelData == null)
             {
                 return;
             }
 
-            List<Person> users = new List<Person>(excelData.GetLength(0));
+            List<UserClass> users = new List<UserClass>(excelData.GetLength(0));
             foreach (var item in excelData)
             {
-                users.Add(new Person(item[0], item[1], item[2], item[3]));
+                users.Add(new UserClass(item[0], item[1], item[2], item[3]));
             }
-            UserList = new ObservableCollection<Person>(users);
+
+            BackgroundWorker backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += (s, e) =>
+            {
+                IsEnableGrid = false;
+                UserList = new ObservableCollection<UserClass>(users);
+                IsEnableGrid = true;
+            }; ;
+
+            backgroundWorker.RunWorkerAsync();
         }
 
     }

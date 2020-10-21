@@ -1,6 +1,6 @@
 ﻿namespace FoodMarketDMS.Business.Models
 {
-    public class Person : BusinessBase
+    public class UserClass : BusinessBase
     {
         private string _name;
         private string _phoneNumber;
@@ -9,9 +9,9 @@
 
         #region Constructor
 
-        public Person() { }
+        public UserClass() { }
 
-        public Person(string name, string phoneNumber, string birth, string address)
+        public UserClass(string name, string phoneNumber, string birth, string address)
         {
             Name = name;
             PhoneNumber = phoneNumber;
