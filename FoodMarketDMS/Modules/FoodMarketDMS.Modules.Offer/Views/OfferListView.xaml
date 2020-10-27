@@ -75,7 +75,7 @@
                 </Style>
             </Grid.Resources>
             <TextBlock HorizontalAlignment="Left" Margin="75,0,0,0" Text="이용률"/>
-            <TextBlock HorizontalAlignment="Left" Margin="170,0,0,0" Text="{Binding UsageRate, StringFormat={}{0}%}"/>
+            <TextBlock HorizontalAlignment="Left" Margin="170,0,0,0" Text="{Binding UsageRate, StringFormat={}{0:0.00}%}"/>
 
             <TextBlock HorizontalAlignment="Left" Margin="320,0,0,0" TextAlignment="Center"
                        FontSize="25" Text="오늘 이용자"/>

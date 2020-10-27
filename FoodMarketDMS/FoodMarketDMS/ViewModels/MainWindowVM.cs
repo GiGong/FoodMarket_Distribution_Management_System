@@ -1,27 +1,37 @@
-﻿using FoodMarketDMS.Modules.User.Views;
-using FoodMarketDMS.Core;
+﻿using FoodMarketDMS.Core;
+using FoodMarketDMS.Core.Mvvm;
+using FoodMarketDMS.Modules.Offer.Views;
+using FoodMarketDMS.Modules.Service.Views;
+using FoodMarketDMS.Modules.User.Views;
+using FoodMarketDMS.Services.Interfaces;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
+using System;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using FoodMarketDMS.Modules.Service.Views;
-using FoodMarketDMS.Modules.Offer.Views;
-using FoodMarketDMS.Core.Mvvm;
 
 namespace FoodMarketDMS.ViewModels
 {
-    public class MainWindowVM : BindableBase, IWindowLoadedLoader
+    public class MainWindowVM : BindableBase, IWindowLoadedLoader, IClosingWindow
     {
         private string _title;
         private string _viewTitle;
 
         private readonly IRegionManager _regionManager;
         private IApplicationCommands _applicationCommands;
+        private readonly IFileService _fileService;
+        private readonly IExcelService _excelService;
+        private readonly IStateWrapperService _stateWrapperService;
 
+        private DelegateCommand _saveStateCommand;
         private DelegateCommand _navigateUserListCommand;
         private DelegateCommand _navigateServiceListCommand;
         private DelegateCommand _navigateOfferListCommand;
+
+        public Action Close { get; set; }
 
         public string Title
         {
@@ -41,6 +51,10 @@ namespace FoodMarketDMS.ViewModels
             set { SetProperty(ref _applicationCommands, value); }
         }
 
+
+        public DelegateCommand SaveStateCommand =>
+            _saveStateCommand ??= new DelegateCommand(ExecuteSaveStateCommand);
+
         public DelegateCommand NavigateUserListCommand =>
             _navigateUserListCommand ??= new DelegateCommand(ExecuteNavigateUserListCommand);
 
@@ -50,10 +64,15 @@ namespace FoodMarketDMS.ViewModels
         public DelegateCommand NavigateOfferListCommand =>
             _navigateOfferListCommand ??= new DelegateCommand(ExecuteNavigateOfferListCommand);
 
-        public MainWindowVM(IApplicationCommands applicationCommands, IRegionManager regionManager)
+
+        public MainWindowVM(IRegionManager regionManager, IApplicationCommands applicationCommands,
+                            IFileService fileService, IExcelService excelService, IStateWrapperService stateWrapperService)
         {
-            _applicationCommands = applicationCommands;
             _regionManager = regionManager;
+            _applicationCommands = applicationCommands;
+            _fileService = fileService;
+            _excelService = excelService;
+            _stateWrapperService = stateWrapperService;
 
             Title = (string)Application.Current.Resources["Program_Name"];
             ViewTitle = ViewNames.UserListView;
@@ -64,6 +83,16 @@ namespace FoodMarketDMS.ViewModels
             ExecuteNavigateServiceListCommand();
             ExecuteNavigateOfferListCommand();
             ExecuteNavigateUserListCommand();
+        }
+
+        private void ExecuteSaveStateCommand()
+        {
+            _stateWrapperService.SaveState();
+        }
+
+        public void WindowClosing(object sender, CancelEventArgs e)
+        {
+            SaveStateCommand.Execute();
         }
 
         private void ExecuteNavigateUserListCommand()

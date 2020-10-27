@@ -5,8 +5,9 @@
         xmlns:core="clr-namespace:FoodMarketDMS.Core;assembly=FoodMarketDMS.Core"
         xmlns:mvvm="clr-namespace:FoodMarketDMS.Core.Mvvm;assembly=FoodMarketDMS.Core"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="{Binding Title}" Height="600" Width="800"
-        mvvm:WindowLoadedLoader.EnableWindowLoadedLoader="True">
+        Title="{Binding Title}" Height="650" Width="800"
+        mvvm:WindowLoadedLoader.EnableWindowLoadedLoader="True"
+        mvvm:WindowCloser.EnableWindowCloser="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="200"/>
@@ -20,7 +21,7 @@
         <StackPanel VerticalAlignment="Bottom" Grid.Row="0" Margin="50,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="제공 등록하기" Command="{Binding ApplicationCommands.RegisterOfferCommand}"/>
-                <Button Content="저장" Command="{Binding ApplicationCommands.SaveStateCommand}"/>
+                <Button Content="저장" Command="{Binding SaveStateCommand}"/>
             </StackPanel>
 
             <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.MenuRegion}"/>

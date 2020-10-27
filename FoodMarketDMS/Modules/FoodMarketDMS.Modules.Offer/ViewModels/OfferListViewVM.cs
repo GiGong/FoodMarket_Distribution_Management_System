@@ -1,7 +1,10 @@
 ﻿using FoodMarketDMS.Business.Models;
 using FoodMarketDMS.Core;
+using FoodMarketDMS.Core.Events;
 using FoodMarketDMS.Modules.Offer.Views;
+using FoodMarketDMS.Services.Interfaces;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
@@ -9,23 +12,23 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Windows.Threading;
 
 namespace FoodMarketDMS.Modules.Offer.ViewModels
 {
     public class OfferListViewVM : BindableBase
     {
+        private int _totalUser;
 
         private double _usageRate;
         private int _todayUser;
         private ObservableCollection<OfferClass> _offerList;
 
         private readonly IDialogService _dialogService;
+        private readonly IStateWrapperService _stateWrapperService;
 
         private DelegateCommand _registerOfferCommand;
 
-
-        public DelegateCommand RegisterOfferCommand =>
-            _registerOfferCommand ??= new DelegateCommand(ExecuteRegisterOfferCommand);
 
         public double UsageRate
         {
@@ -36,7 +39,14 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
         public int TodayUser
         {
             get { return _todayUser; }
-            set { SetProperty(ref _todayUser, value); }
+            set
+            {
+                SetProperty(ref _todayUser, value);
+                if (_totalUser != 0)
+                {
+                    UsageRate = (double)TodayUser / _totalUser * 100;
+                }
+            }
         }
 
         public ObservableCollection<OfferClass> OfferList
@@ -45,15 +55,26 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             set { SetProperty(ref _offerList, value); }
         }
 
+        public DelegateCommand RegisterOfferCommand =>
+            _registerOfferCommand ??= new DelegateCommand(ExecuteRegisterOfferCommand);
 
-        public OfferListViewVM(IDialogService dialogService, IApplicationCommands applicationCommands)
+
+        public OfferListViewVM(IDialogService dialogService, IEventAggregator eventAggregator, IApplicationCommands applicationCommands,
+                                IStateWrapperService stateWrapperService)
         {
             _dialogService = dialogService;
+            _stateWrapperService = stateWrapperService;
 
+            eventAggregator.GetEvent<UserCountChanged>().Subscribe(UserCount_Changed);
+            eventAggregator.GetEvent<UserListChanged>().Subscribe(UserList_Changed);
             applicationCommands.RegisterOfferCommand.RegisterCommand(RegisterOfferCommand);
 
             OfferList = new ObservableCollection<OfferClass>();
             OfferList.CollectionChanged += OfferList_CollectionChanged;
+
+            _totalUser = 0;
+            UsageRate = 0;
+            TodayUser = 0;
         }
 
         private void OfferList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -63,7 +84,8 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (OfferClass item in e.NewItems)
                     {
-                        if (item.Date == DateTime.Now)
+                        _stateWrapperService.Offers.Add(item);
+                        if (item.Date.Date == DateTime.Now.Date)
                         {
                             TodayUser++;
                         }
@@ -72,6 +94,7 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (OfferClass item in e.OldItems)
                     {
+                        _stateWrapperService.Offers.Remove(item);
                         if (item.Date == DateTime.Now)
                         {
                             TodayUser--;
@@ -81,19 +104,35 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             }
         }
 
+        private void UserCount_Changed(int count)
+        {
+            _totalUser = count;
+            UsageRate = (double)TodayUser / _totalUser * 100;
+        }
+
+        private void UserList_Changed()
+        {
+            Dispatcher.CurrentDispatcher.BeginInvoke(
+                () =>
+                {
+                    OfferList.Clear();
+                    _stateWrapperService.Offers.Clear();
+                });
+        }
+
         private void ExecuteRegisterOfferCommand()
         {
-            _dialogService.ShowDialog(nameof(RegisterOfferView), null,
+            _dialogService.ShowDialog(nameof(RegisterOfferView), new DialogParameters { { OfferParameters.Users, _stateWrapperService.Users } },
                 (result) =>
                 {
-                    if (result == null || result.Result != ButtonResult.OK)
+                    if (result is null || result.Result != ButtonResult.OK)
                     {
                         return;
                     }
 
                     OfferList.Add(new OfferClass(
                         DateTime.Now,
-                        result.Parameters.GetValue<UserClass>(OfferParameters.OfferUser),
+                        result.Parameters.GetValue<uint>(OfferParameters.UserId),
                         result.Parameters.GetValue<string>(OfferParameters.UserName),
                         result.Parameters.GetValue<string>(OfferParameters.Provider),
                         result.Parameters.GetValue<List<string>>(OfferParameters.OfferItems),

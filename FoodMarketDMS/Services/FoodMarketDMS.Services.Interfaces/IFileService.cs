@@ -2,6 +2,8 @@
 {
     public interface IFileService
     {
+        public int Index { get; set; }
+
         /// <summary>
         /// Get file path to open, using OpenFileDialog
         /// </summary>

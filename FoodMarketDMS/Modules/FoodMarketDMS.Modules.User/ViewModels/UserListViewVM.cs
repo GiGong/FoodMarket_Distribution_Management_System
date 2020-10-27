@@ -1,17 +1,16 @@
 ﻿using FoodMarketDMS.Business.Models;
 using FoodMarketDMS.Core;
-using FoodMarketDMS.Core.Mvvm;
+using FoodMarketDMS.Core.Events;
+using FoodMarketDMS.Core.Extensions;
 using FoodMarketDMS.Services.Interfaces;
 using Prism.Commands;
-using Prism.Mvvm;
-using System;
+using Prism.Events;
+using Prism.Regions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace FoodMarketDMS.Modules.User.ViewModels
 {
@@ -20,10 +19,12 @@ namespace FoodMarketDMS.Modules.User.ViewModels
         private bool _isEnableGrid;
         private ObservableCollection<UserClass> _userList;
 
-        private DelegateCommand _loadUserListCommand;
-
+        private readonly IEventAggregator _eventAggregator;
+        private readonly IStateWrapperService _stateWrapperService;
         private readonly IFileService _fileService;
         private readonly IExcelService _excelService;
+
+        private DelegateCommand _loadUserListCommand;
 
         public bool IsEnableGrid
         {
@@ -34,27 +35,55 @@ namespace FoodMarketDMS.Modules.User.ViewModels
         public ObservableCollection<UserClass> UserList
         {
             get { return _userList; }
-            set { SetProperty(ref _userList, value); }
+            set
+            {
+                SetProperty(ref _userList, value);
+                _eventAggregator.GetEvent<UserCountChanged>().Publish(UserList.Count);
+            }
         }
+
 
         public DelegateCommand LoadUserListCommand =>
             _loadUserListCommand ??= new DelegateCommand(ExecuteLoadUserListCommand);
 
 
-        public UserListViewVM(IApplicationCommands applicationCommands, IFileService fileService, IExcelService excelService)
+        public UserListViewVM(IEventAggregator eventAggregator,
+            IStateWrapperService stateWrapperService, IApplicationCommands applicationCommands, IFileService fileService, IExcelService excelService)
         {
-            applicationCommands.LoadUserListCommand.RegisterCommand(LoadUserListCommand);
+            _eventAggregator = eventAggregator;
+            _stateWrapperService = stateWrapperService;
             _fileService = fileService;
             _excelService = excelService;
+
+            applicationCommands.LoadUserListCommand.RegisterCommand(LoadUserListCommand);
+
+
+            BackgroundWorker backgroundWorker = new BackgroundWorker();
+            backgroundWorker.RunAsync((s, e) =>
+            {
+                _stateWrapperService.LoadState();
+                UserList = new ObservableCollection<UserClass>(_stateWrapperService.Users);
+            });
+        }
+
+        public override void OnNavigatedTo(NavigationContext navigationContext)
+        {
 
         }
 
         private void ExecuteLoadUserListCommand()
         {
+            if (MessageBox.Show("이용자 목록을 새로 불러오면\n제공 목록이 초기화됩니다.\n계속 하시겠습니까?",
+                (string)Application.Current.Resources["Program_Name"], MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) 
+                == MessageBoxResult.No)
+            {
+                return;
+            }
+
             string excelPath = _fileService.OpenFilePath(IExcelService.EXCEL_FILE_EXT, (string)Application.Current.Resources["Program_Name"]);
             var excelData = _excelService.GetExcelData(excelPath, typeof(UserClass).GetProperties().Count());
-            if (excelData == null)
-            {
+            if (excelData is null)
+            {// fail to load excel data for any reason
                 return;
             }
 
@@ -65,15 +94,12 @@ namespace FoodMarketDMS.Modules.User.ViewModels
             }
 
             BackgroundWorker backgroundWorker = new BackgroundWorker();
-            backgroundWorker.DoWork += (s, e) =>
+            backgroundWorker.RunAsync((s, e) =>
             {
-                IsEnableGrid = false;
                 UserList = new ObservableCollection<UserClass>(users);
-                IsEnableGrid = true;
-            }; ;
-
-            backgroundWorker.RunWorkerAsync();
+                _stateWrapperService.Users = users;
+                _eventAggregator.GetEvent<UserListChanged>().Publish();
+            });
         }
-
     }
 }

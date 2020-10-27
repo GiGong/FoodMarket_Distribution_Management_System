@@ -6,7 +6,7 @@
     <Grid>
         <!-- maybe use clipboard helper
         https://stackoverflow.com/questions/4118617/wpf-datagrid-pasting-->
-        <DataGrid IsEnabled="{Binding IsEnableGrid}" ItemsSource="{Binding UserList}" Grid.Row="1"
+        <DataGrid ItemsSource="{Binding UserList, IsAsync=True}" Grid.Row="1"
                   AutoGenerateColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="이름" Width="75" Binding="{Binding Name}"/>
@@ -15,21 +15,5 @@
                 <DataGridTextColumn Header="주소" Width="300" Binding="{Binding Address}"/>
             </DataGrid.Columns>
         </DataGrid>
-
-        <!--<ListView Grid.Row="1" ItemsSource="{Binding UserList}">
-            <ListView.Resources>
-            <Style TargetType="{x:Type GridViewColumnHeader}">
-                <Setter Property="HorizontalContentAlignment" Value="Left" />
-            </Style>
-            </ListView.Resources>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="이름" Width="75" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="핸드폰 번호" Width="150" DisplayMemberBinding="{Binding PhoneNumber}"/>
-                    <GridViewColumn Header="주민등록번호" Width="150" DisplayMemberBinding="{Binding SocialNumber}"/>
-                    <GridViewColumn Header="주소" Width="250" DisplayMemberBinding="{Binding Address}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>-->
     </Grid>
 </UserControl>

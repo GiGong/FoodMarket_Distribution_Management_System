@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoodMarketDMS.Business.Models
 {
-    public class OfferClass : BusinessBase
+    public class OfferClass : BusinessBase, IStringArraySerializable
     {
-        
+
         private DateTime _date;
-        private UserClass _user;
+        private uint _userId;
         private string _userName;
         private string _provider;
         private List<string> _products;
@@ -20,10 +21,10 @@ namespace FoodMarketDMS.Business.Models
             set { SetProperty(ref _date, value); }
         }
 
-        public UserClass User
+        public uint UserId
         {
-            get { return _user; }
-            set { SetProperty(ref _user, value); }
+            get { return _userId; }
+            set { SetProperty(ref _userId, value); }
         }
 
         public string UserName
@@ -50,16 +51,33 @@ namespace FoodMarketDMS.Business.Models
             set { SetProperty(ref _services, value); }
         }
 
-        public OfferClass() { }
 
-        public OfferClass(DateTime date, UserClass user, string userName, string provider, List<string> products, List<string> services)
+        public OfferClass(DateTime date, uint userId, string userName, string provider, List<string> products, List<string> services)
         {
             Date = date;
-            User = user;
+            UserId = userId;
             UserName = userName;
             Provider = provider;
             Products = products;
             Services = services;
+        }
+
+        public OfferClass(string[] data)
+        {
+            Date = new DateTime(long.Parse(data[0]));
+            UserId = uint.Parse(data[1]);
+            UserName = data[2];
+            Provider = data[3];
+            Products = data[4].Split('\n').ToList();
+            Services = data[5].Split('\n').ToList();
+        }
+
+        public string[] ToStringArray()
+        {
+            string productsString = string.Join("\n", Products);
+            string servicesString = string.Join("\n", Services);
+
+            return new string[] { Date.Ticks.ToString(), UserId.ToString(), UserName, Provider, productsString, servicesString };
         }
 
     }

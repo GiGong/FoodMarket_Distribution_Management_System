@@ -10,5 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\FoodMarketDMS.Business\FoodMarketDMS.Business.csproj" />
     <ProjectReference Include="..\..\FoodMarketDMS.Core\FoodMarketDMS.Core.csproj" />
+    <ProjectReference Include="..\..\Services\FoodMarketDMS.Services.Interfaces\FoodMarketDMS.Services.Interfaces.csproj" />
   </ItemGroup>
 </Project>

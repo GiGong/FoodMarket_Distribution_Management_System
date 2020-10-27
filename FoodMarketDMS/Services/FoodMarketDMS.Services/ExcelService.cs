@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -17,6 +18,9 @@ namespace FoodMarketDMS.Services
         private static ProgressWindow _progressWindow;
         private static AutoResetEvent _doneEvent;
 
+
+        #region Load, Get Excel Data
+
         public string[][] GetExcelData(string path, int numOfColumn)
         {
             BackgroundWorker worker = new BackgroundWorker();
@@ -29,7 +33,7 @@ namespace FoodMarketDMS.Services
             _doneEvent = new AutoResetEvent(false);
             _progressWindow = new ProgressWindow();
 
-            worker.RunWorkerAsync(new ExcelParameter() { Path = path, NumOfColumn = numOfColumn });
+            worker.RunWorkerAsync(new ExcelLoadParameter { Path = path, NumOfColumn = numOfColumn });
             _progressWindow.ShowDialog();
 
             _doneEvent.WaitOne();
@@ -44,7 +48,7 @@ namespace FoodMarketDMS.Services
             Excel.Workbook wb = null;
             Excel.Worksheet ws = null;
 
-            var param = (ExcelParameter)e.Argument;
+            var param = (ExcelLoadParameter)e.Argument;
             string path = param.Path;
             int numOfColumn = param.NumOfColumn;
 
@@ -58,7 +62,7 @@ namespace FoodMarketDMS.Services
                 excelApp = new Excel.Application();
 
                 // 엑셀 파일 열기
-                wb = excelApp.Workbooks.Open(path);
+                wb = excelApp.Workbooks.Open(path, ReadOnly: true);
 
                 worker.ReportProgress(3);
 
@@ -111,7 +115,7 @@ namespace FoodMarketDMS.Services
 
                 }
 
-                wb.Close(true);
+                wb.Close();
                 excelApp.Quit();
 
                 _result = list.ToArray();
@@ -138,6 +142,125 @@ namespace FoodMarketDMS.Services
             }
         }
 
+        #endregion Load, Get Excel Data
+
+
+        public void SaveToExcel(string[][] data, string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveToExcel(string[][] data, string path, int indexOfWorksheet)
+        {
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += SaveExcelData;
+            worker.ProgressChanged += Worker_ProgressChanged;
+            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;// Can use BackgroundWorker extension?
+
+            _doneEvent = new AutoResetEvent(false);
+            _progressWindow = new ProgressWindow();
+
+            worker.RunWorkerAsync(new ExcelSaveParameter { Path = path, IndexOfWorksheet = indexOfWorksheet, Data = data });
+            _progressWindow.ShowDialog();
+
+            _doneEvent.WaitOne();
+            KillExcel();
+        }
+
+        private void SaveExcelData(object sender, DoWorkEventArgs e)
+        {
+            Excel.Application excelApp = null;
+            Excel.Workbook wb = null;
+            Excel.Worksheet ws = null;
+
+            var param = (ExcelSaveParameter)e.Argument;
+            string path = param.Path;
+            int indexOfWorksheet = param.IndexOfWorksheet;
+            var originData = param.Data;
+            if (originData.Length == 0)
+            {
+                _doneEvent.Set();
+                return;
+            }
+
+            var worker = sender as BackgroundWorker;
+
+            try
+            {
+                worker.ReportProgress(0, "Opening Excel...");
+
+                excelApp = new Excel.Application();
+
+                // 엑셀 파일 열기
+                wb = excelApp.Workbooks.Add(System.Reflection.Missing.Value);
+
+                worker.ReportProgress(3);
+
+                ws = wb.Worksheets.get_Item(indexOfWorksheet) as Excel.Worksheet;
+
+                worker.ReportProgress(5, "Saving Data...");
+
+                int row = originData.GetLength(0);
+
+                string[] columnNames = originData[0]; // assume 1st row of origin data is column name
+                int column = columnNames.Length;
+
+                object[,] data = new object[row, column];
+
+                for (int r = 0; r < row; r++)
+                {
+                    for (int c = 0; c < column; c++)
+                    {
+                        data[r, c] = originData[r][c];
+                    }
+
+                    (sender as BackgroundWorker).ReportProgress((int)(((double)r / row) * 100));
+                }
+
+                Excel.Range rng = ws.Range[ws.Cells[1, 1], ws.Cells[row, column]];
+                rng.Value = data;
+                wb.SaveCopyAs(path);
+                wb.Close(SaveChanges: true);
+                excelApp.Quit();
+            }
+            catch (Exception ex)
+            {
+                if (wb != null)
+                {
+                    wb.Close(SaveChanges: false);
+                }
+                if (excelApp != null)
+                {
+                    excelApp.Quit();
+                }
+                throw ex;
+            }
+            finally
+            {
+                // Clean up
+                ReleaseExcelObject(ws);
+                ReleaseExcelObject(wb);
+                ReleaseExcelObject(excelApp);
+                _doneEvent.Set();
+            }
+        }
+
+        private static void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.UserState != null)
+            {
+                _progressWindow.State = e.UserState.ToString();
+            }
+            _progressWindow.Progress = e.ProgressPercentage;
+        }
+
+        private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            _progressWindow.Close();
+        }
+
+
         static void ReleaseExcelObject(object obj)
         {
             try
@@ -159,27 +282,6 @@ namespace FoodMarketDMS.Services
             }
         }
 
-        private static void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            if (e.UserState != null)
-            {
-                _progressWindow.State = e.UserState.ToString();
-            }
-            _progressWindow.Progress = e.ProgressPercentage;
-        }
-
-        private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            _progressWindow.Close();
-        }
-
-        private struct ExcelParameter
-        {
-            public string Path { get; set; }
-            public int NumOfColumn { get; set; }
-        }
-
-
         /// <summary>
         /// Kill all child excel processes
         /// </summary>
@@ -196,6 +298,22 @@ namespace FoodMarketDMS.Services
             }
         }
 
+        #region Parameters
+
+        private struct ExcelLoadParameter
+        {
+            public string Path { get; set; }
+            public int NumOfColumn { get; set; }
+        }
+
+        private struct ExcelSaveParameter
+        {
+            public string Path { get; set; }
+            public int IndexOfWorksheet { get; set; }
+            public string[][] Data { get; set; }
+        }
+
+        #endregion Parameters
     }
 
     public static class ProcessExtensions

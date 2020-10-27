@@ -2,7 +2,9 @@
 {
     public class OfferParameters
     {
-        public const string OfferUser = nameof(OfferUser);
+        public const string Users = nameof(Users);
+
+        public const string UserId = nameof(UserId);
         public const string UserName = nameof(UserName);
         public const string Provider = nameof(Provider);
         public const string OfferItems = nameof(OfferItems);

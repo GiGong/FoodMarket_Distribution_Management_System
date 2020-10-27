@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True"
-             Width="510" Height="590">
+             Width="540" Height="660">
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
@@ -21,34 +21,57 @@
             <Label Content="제공 정보 입력"/>
         </Viewbox>
 
-        <Grid Grid.Row="1" Margin="50,0">
+        <Grid Grid.Row="1" Margin="55,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="90"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="auto"/><!-- empty row -->
                 <RowDefinition Height="200"/>
                 <RowDefinition Height="200"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="150"/>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!--이용자, 제공처리자, 물품 (갯수 제한 X), 서비스 물품 (갯수 제한 X), 입력버튼, 종료버튼-->
-            <Label Grid.Column="0">이용자 성함</Label>
-            <TextBox Grid.Column="1" Margin="0,3" Text="{Binding UserName}"/>
+            <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Top">
+                <Label>이용자 성함</Label>
+                <Label Margin="0,3" IsEnabled="False" HorizontalContentAlignment="Right">선택</Label>
+            </StackPanel>
+                
+            <StackPanel Grid.Row="0" Grid.Column="1" >
+                <TextBox Margin="0,3" Text="{Binding UserName}"
+                         Height="22" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                <TextBox Margin="0,3" IsReadOnly="True" Focusable="False" Text="{Binding ResultText}"
+                         Height="22" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
 
-            <Label Grid.Column="2" Margin="20,0,0,0">제공 처리자</Label>
-            <TextBox Grid.Column="3" Margin="0,3" Text="{Binding Provider}"/>
+                <Button Margin="0,3" Content="검색" Width="50" Height="22" HorizontalAlignment="Right"
+                        Command="{Binding UserSearchCommand}" CommandParameter="{Binding UserName}"/>
+            </StackPanel>
+            
+            <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">제공 처리자</Label>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Provider}"
+                     Height="22" VerticalContentAlignment="Center"/>
 
-            <Label Grid.Row="2">물품</Label>
-            <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,3"
+            <ListView Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0"
+                      SelectionMode="Single"
+                      ItemsSource="{Binding UserSearchList}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="이용자 성함" Width="80" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="생년월일" Width="90" DisplayMemberBinding="{Binding Birth}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <Label Grid.Row="3">물품</Label>
+            <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,3"
                      AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                      Text="{Binding TextOfferItems}"/>
-            <Label Grid.Row="3">서비스 품목</Label>
-            <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,3"
+            <Label Grid.Row="4">서비스 품목</Label>
+            <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,3"
                      AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                      Text="{Binding TextServiceItems}"/>
 

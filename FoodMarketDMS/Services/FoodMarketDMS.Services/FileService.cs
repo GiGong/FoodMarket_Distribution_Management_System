@@ -5,6 +5,8 @@ namespace FoodMarketDMS.Services
 {
     public class FileService : IFileService
     {
+        public int Index { get; set; } = 0;
+
         public string OpenFilePath(string filter, string title)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog()

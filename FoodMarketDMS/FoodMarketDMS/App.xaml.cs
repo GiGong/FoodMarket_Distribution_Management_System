@@ -1,7 +1,10 @@
-﻿using FoodMarketDMS.Core;
+﻿using FoodMarketDMS.Business.Models;
+using FoodMarketDMS.Core;
 using FoodMarketDMS.Modules.Offer;
 using FoodMarketDMS.Modules.Service;
 using FoodMarketDMS.Modules.User;
+using FoodMarketDMS.Services;
+using FoodMarketDMS.Services.Interfaces;
 using FoodMarketDMS.Views;
 using Prism.Ioc;
 using Prism.Modularity;
@@ -24,6 +27,10 @@ namespace FoodMarketDMS
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IFileService, FileService>();
+            containerRegistry.RegisterSingleton<IExcelService, ExcelService>();
+            containerRegistry.RegisterSingleton<IStateWrapperService, StateWrapperService>();
+
             containerRegistry.RegisterSingleton<IApplicationCommands, ApplicationCommands>();
         }
 

@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\FoodMarketDMS.Business\FoodMarketDMS.Business.csproj" />
+  </ItemGroup>
+
 </Project>
