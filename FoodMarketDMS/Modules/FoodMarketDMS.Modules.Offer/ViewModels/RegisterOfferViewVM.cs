@@ -2,12 +2,11 @@
 using FoodMarketDMS.Core;
 using FoodMarketDMS.Core.Extensions;
 using Prism.Commands;
-using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.Windows;
 
 namespace FoodMarketDMS.Modules.Offer.ViewModels
 {
@@ -15,13 +14,14 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
     {
         private UserClass _selectedUser;
         private string _userName;
-        private string _resultText;
+        private string _textResult;
         private ObservableCollection<UserClass> _userSearchList;
+        private bool _isSearchExist;
         private string _provider;
         private string _textOfferItems;
         private string _textServiceItems;
 
-        private List<UserClass> _users;
+        private List<UserClass> _currUsers;
 
 
         private DelegateCommand _enterCommand;
@@ -32,7 +32,11 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
         public UserClass SelectedUser
         {
             get { return _selectedUser; }
-            set { SetProperty(ref _selectedUser, value); }
+            set
+            {
+                SetProperty(ref _selectedUser, value);
+                TextResult = SelectedUser is null ? string.Empty : $"[{SelectedUser.Birth}] [{SelectedUser.Name}] [{SelectedUser.PhoneNumber}]";
+            }
         }
 
         public string UserName
@@ -41,16 +45,22 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             set { SetProperty(ref _userName, value); }
         }
 
-        public string ResultText
+        public string TextResult
         {
-            get { return _resultText; }
-            set { SetProperty(ref _resultText, value); }
+            get { return _textResult; }
+            set { SetProperty(ref _textResult, value); }
         }
 
         public ObservableCollection<UserClass> UserSearchList
         {
             get { return _userSearchList; }
             set { SetProperty(ref _userSearchList, value); }
+        }
+
+        public bool IsSearchExist
+        {
+            get { return _isSearchExist; }
+            set { SetProperty(ref _isSearchExist, value); }
         }
 
         public string Provider
@@ -88,28 +98,31 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            _users = parameters.GetValue<List<UserClass>>(OfferParameters.Users);
+            _currUsers = parameters.GetValue<List<UserClass>>(OfferParameters.Users);
         }
 
         private void ExecuteEnterCommand()
         {
-            List<string> offerItems = string.IsNullOrWhiteSpace(TextOfferItems) ? null : new List<string>(TextOfferItems.Split('\n'));
-            List<string> serviceItems = string.IsNullOrWhiteSpace(TextServiceItems) ? null : new List<string>(TextServiceItems.Split('\n'));
+            var searchResult = SearchUsers(UserName);
 
-            offerItems?.RemoveEmptyString();
-            offerItems?.TrimString();
-            serviceItems?.RemoveEmptyString();
-            serviceItems?.TrimString();
+            if (searchResult.Count < 1)
+            {
+                // if can add unexist user to offer list
+                //var result = MessageBox.Show($"\"{UserName}\" 이/가 이용자 목록에 존재하지 않습니다.\n등록하시겠습니까?", (string)Application.Current.Resources["Program_Name"], MessageBoxButton.YesNo, MessageBoxImage.Question);
+                //if (result == MessageBoxResult.Yes)
+                //{
+                //    RaiseRequestClose(new DialogResult(ButtonResult.OK, MakeParameter(null)));
+                //}
+                MessageBox.Show($"\"{UserName}\" 이/가 이용자 목록에 존재하지 않습니다.", (string)Application.Current.Resources["Program_Name"], MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            else if (searchResult.Count > 1 && SelectedUser is null)
+            {
+                MessageBox.Show("중복된 이용자가 있습니다.", (string)Application.Current.Resources["Program_Name"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
-            RaiseRequestClose(new DialogResult(ButtonResult.OK,
-                new DialogParameters
-                {
-                    { OfferParameters.UserId, SelectedUser }, // TODO: OfferUser -> UserId
-                    { OfferParameters.UserName, UserName },
-                    { OfferParameters.Provider, Provider },
-                    { OfferParameters.OfferItems, offerItems },
-                    { OfferParameters.ServiceItems, serviceItems }
-                }));
+            RaiseRequestClose(new DialogResult(ButtonResult.OK, MakeParameter(searchResult)));
         }
 
         private void ExecuteCloseCommand()
@@ -119,15 +132,33 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
 
         private void ExecuteUserSearchCommand(string userName)
         {
-            var searchResult = _users.FindAll(user => user.Name == userName);
-            if (searchResult is null)
-            {
-                return;
-            }
-
-            UserSearchList.AddRange(searchResult);
+            SelectedUser = null;
+            UserSearchList.Clear();
+            UserSearchList.AddRange(SearchUsers(userName));
         }
 
+        private DialogParameters MakeParameter(List<UserClass> searchUsers)
+        {
+            List<string> offerItems = string.IsNullOrWhiteSpace(TextOfferItems) ? new List<string>() : new List<string>(TextOfferItems.Split('\n'));
+            List<string> serviceItems = string.IsNullOrWhiteSpace(TextServiceItems) ? new List<string>() : new List<string>(TextServiceItems.Split('\n'));
 
+            offerItems?.RemoveEmptyString();
+            offerItems?.TrimString();
+            serviceItems?.RemoveEmptyString();
+            serviceItems?.TrimString();
+
+            UserClass offerUser = searchUsers[0];
+            return new DialogParameters { { OfferParameters.NewOffer, new OfferClass(DateTime.Now, offerUser.Id, offerUser.Name, Provider, offerItems, serviceItems) } };
+            // if can add unexist user to offer list
+            //UserClass offerUser = searchUsers?[0];
+            //return new DialogParameters { { OfferParameters.NewOffer, new OfferClass(DateTime.Now, offerUser?.Id ?? -1, offerUser?.Name ?? UserName, Provider, offerItems, serviceItems) } };
+        }
+
+        private List<UserClass> SearchUsers(string name)
+        {
+            var result = _currUsers.FindAll(user => user.Name == name);
+            IsSearchExist = result.Count > 0;
+            return result;
+        }
     }
 }

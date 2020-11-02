@@ -1,4 +1,5 @@
 ﻿using FoodMarketDMS.Core;
+using FoodMarketDMS.Core.Extensions;
 using FoodMarketDMS.Core.Mvvm;
 using FoodMarketDMS.Modules.Offer.Views;
 using FoodMarketDMS.Modules.Service.Views;
@@ -12,6 +13,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace FoodMarketDMS.ViewModels
 {
@@ -80,6 +82,9 @@ namespace FoodMarketDMS.ViewModels
 
         public void WindowLoaded()
         {
+            BackgroundWorker backgroundWorker = new BackgroundWorker();
+            backgroundWorker.RunAsync((s, e) => _stateWrapperService.LoadState());
+
             ExecuteNavigateServiceListCommand();
             ExecuteNavigateOfferListCommand();
             ExecuteNavigateUserListCommand();

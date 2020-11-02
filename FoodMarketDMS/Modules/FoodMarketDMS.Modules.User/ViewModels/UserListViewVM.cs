@@ -57,24 +57,18 @@ namespace FoodMarketDMS.Modules.User.ViewModels
 
             applicationCommands.LoadUserListCommand.RegisterCommand(LoadUserListCommand);
 
-
-            BackgroundWorker backgroundWorker = new BackgroundWorker();
-            backgroundWorker.RunAsync((s, e) =>
-            {
-                _stateWrapperService.LoadState();
-                UserList = new ObservableCollection<UserClass>(_stateWrapperService.Users);
-            });
+            UserList = new ObservableCollection<UserClass>(_stateWrapperService.Users);
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
-
+            
         }
 
         private void ExecuteLoadUserListCommand()
         {
             if (MessageBox.Show("이용자 목록을 새로 불러오면\n제공 목록이 초기화됩니다.\n계속 하시겠습니까?",
-                (string)Application.Current.Resources["Program_Name"], MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) 
+                (string)Application.Current.Resources["Program_Name"], MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No)
                 == MessageBoxResult.No)
             {
                 return;

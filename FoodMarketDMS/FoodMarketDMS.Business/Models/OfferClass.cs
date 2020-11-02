@@ -8,7 +8,7 @@ namespace FoodMarketDMS.Business.Models
     {
 
         private DateTime _date;
-        private uint _userId;
+        private long _userId;
         private string _userName;
         private string _provider;
         private List<string> _products;
@@ -21,7 +21,7 @@ namespace FoodMarketDMS.Business.Models
             set { SetProperty(ref _date, value); }
         }
 
-        public uint UserId
+        public long UserId
         {
             get { return _userId; }
             set { SetProperty(ref _userId, value); }
@@ -52,7 +52,7 @@ namespace FoodMarketDMS.Business.Models
         }
 
 
-        public OfferClass(DateTime date, uint userId, string userName, string provider, List<string> products, List<string> services)
+        public OfferClass(DateTime date, long userId, string userName, string provider, List<string> products, List<string> services)
         {
             Date = date;
             UserId = userId;
@@ -65,7 +65,7 @@ namespace FoodMarketDMS.Business.Models
         public OfferClass(string[] data)
         {
             Date = new DateTime(long.Parse(data[0]));
-            UserId = uint.Parse(data[1]);
+            UserId = long.Parse(data[1]);
             UserName = data[2];
             Provider = data[3];
             Products = data[4].Split('\n').ToList();

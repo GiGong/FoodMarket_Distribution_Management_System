@@ -69,12 +69,12 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             eventAggregator.GetEvent<UserListChanged>().Subscribe(UserList_Changed);
             applicationCommands.RegisterOfferCommand.RegisterCommand(RegisterOfferCommand);
 
-            OfferList = new ObservableCollection<OfferClass>();
+            OfferList = new ObservableCollection<OfferClass>(_stateWrapperService.Offers);
             OfferList.CollectionChanged += OfferList_CollectionChanged;
 
             _totalUser = 0;
             UsageRate = 0;
-            TodayUser = 0;
+            TodayUser = OfferList.Count(item => item.Date.Date == DateTime.Now.Date);
         }
 
         private void OfferList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -125,19 +125,12 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             _dialogService.ShowDialog(nameof(RegisterOfferView), new DialogParameters { { OfferParameters.Users, _stateWrapperService.Users } },
                 (result) =>
                 {
-                    if (result is null || result.Result != ButtonResult.OK)
+                    if (result.Result != ButtonResult.OK)
                     {
                         return;
                     }
 
-                    OfferList.Add(new OfferClass(
-                        DateTime.Now,
-                        result.Parameters.GetValue<uint>(OfferParameters.UserId),
-                        result.Parameters.GetValue<string>(OfferParameters.UserName),
-                        result.Parameters.GetValue<string>(OfferParameters.Provider),
-                        result.Parameters.GetValue<List<string>>(OfferParameters.OfferItems),
-                        result.Parameters.GetValue<List<string>>(OfferParameters.ServiceItems)
-                    ));
+                    OfferList.Add(result.Parameters.GetValue<OfferClass>(OfferParameters.NewOffer));
                 });
         }
     }

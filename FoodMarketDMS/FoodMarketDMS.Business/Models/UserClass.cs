@@ -5,7 +5,7 @@ namespace FoodMarketDMS.Business.Models
 {
     public class UserClass : BusinessBase, IStringArraySerializable
     {
-        private readonly static HashSet<uint> ID_CHECK = new HashSet<uint>();
+        private readonly static HashSet<long> ID_CHECK = new HashSet<long>();
         private static uint INDEX = 0;
 
         private string _name;
@@ -15,7 +15,7 @@ namespace FoodMarketDMS.Business.Models
 
         #region Property
 
-        public uint Id { get; }
+        public long Id { get; }
 
         public string Name
         {
@@ -55,7 +55,11 @@ namespace FoodMarketDMS.Business.Models
                 INDEX++;
             }
             Id = INDEX++;
-            ID_CHECK.Add(Id);
+
+            if (Id > -1)
+            {
+                ID_CHECK.Add(Id);
+            }
 
             Name = name;
             PhoneNumber = phoneNumber;
@@ -69,7 +73,7 @@ namespace FoodMarketDMS.Business.Models
         public UserClass(string[] data)
         {
             INDEX++;
-            Id = uint.Parse(data[0]);
+            Id = long.Parse(data[0]);
             if (!ID_CHECK.Add(Id))
             {
                 throw new Exception("Identifier overlap exception!");

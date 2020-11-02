@@ -44,7 +44,7 @@
             <StackPanel Grid.Row="0" Grid.Column="1" >
                 <TextBox Margin="0,3" Text="{Binding UserName}"
                          Height="22" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
-                <TextBox Margin="0,3" IsReadOnly="True" Focusable="False" Text="{Binding ResultText}"
+                <TextBox Margin="0,3" IsReadOnly="True" IsTabStop="False" Text="{Binding TextResult}"
                          Height="22" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
 
                 <Button Margin="0,3" Content="검색" Width="50" Height="22" HorizontalAlignment="Right"
@@ -57,11 +57,12 @@
 
             <ListView Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0"
                       SelectionMode="Single"
-                      ItemsSource="{Binding UserSearchList}">
+                      ItemsSource="{Binding UserSearchList}" SelectedItem="{Binding SelectedUser}" IsEnabled="{Binding IsSearchExist}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="이용자 성함" Width="80" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="생년월일" Width="90" DisplayMemberBinding="{Binding Birth}"/>
+                        <GridViewColumn Header="이용자 성함" Width="75" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="생년월일" Width="85" DisplayMemberBinding="{Binding Birth}"/>
+                        <GridViewColumn Header="핸드폰 번호" Width="90" DisplayMemberBinding="{Binding PhoneNumber}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -81,7 +82,7 @@
                 Content="입력"
                 Command="{Binding EnterCommand}"/>
         <Button Width="80" Height="25" Margin="260,0,150,20" Grid.Row="1" VerticalAlignment="Bottom"
-                Content="종료"
+                Content="종료" IsCancel="True"
                 Command="{Binding CloseCommand}"/>
 
     </Grid>
