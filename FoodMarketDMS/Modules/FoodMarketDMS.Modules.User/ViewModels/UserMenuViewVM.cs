@@ -1,25 +1,20 @@
-﻿using FoodMarketDMS.Core;
-using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Prism.Mvvm;
 
 namespace FoodMarketDMS.Modules.User.ViewModels
 {
     public class UserMenuViewVM : BindableBase
     {
-        private IApplicationCommands _applicationCommands;
+        private IUserModuleCommands _userModuleCommands;
 
-        public IApplicationCommands ApplicationCommands
+        public IUserModuleCommands UserModuleCommands
         {
-            get { return _applicationCommands; }
-            set { SetProperty(ref _applicationCommands, value); }
+            get { return _userModuleCommands; }
+            set { SetProperty(ref _userModuleCommands, value); }
         }
 
-        public UserMenuViewVM(IApplicationCommands applicationCommands)
+        public UserMenuViewVM(IUserModuleCommands userModuleCommands)
         {
-            _applicationCommands = applicationCommands;
+            UserModuleCommands = userModuleCommands;
         }
     }
 }

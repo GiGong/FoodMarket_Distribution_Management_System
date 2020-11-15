@@ -3,9 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid>
-        <!-- maybe use clipboard helper
-        https://stackoverflow.com/questions/4118617/wpf-datagrid-pasting-->
+    <ListView ItemsSource="{Binding UserList, IsAsync=True}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Header="이름" Width="75" DisplayMemberBinding="{Binding Name}"/>
+                <GridViewColumn Header="핸드폰 번호" Width="150" DisplayMemberBinding="{Binding PhoneNumber}"/>
+                <GridViewColumn Header="생년월일" Width="100" DisplayMemberBinding="{Binding Birth}"/>
+                <GridViewColumn Header="주소" Width="300" DisplayMemberBinding="{Binding Address}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+    <!--<Grid>
+        --><!-- maybe use clipboard helper
+        https://stackoverflow.com/questions/4118617/wpf-datagrid-pasting--><!--
         <DataGrid ItemsSource="{Binding UserList, IsAsync=True}" Grid.Row="1"
                   AutoGenerateColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
             <DataGrid.Columns>
@@ -15,5 +25,5 @@
                 <DataGridTextColumn Header="주소" Width="300" Binding="{Binding Address}"/>
             </DataGrid.Columns>
         </DataGrid>
-    </Grid>
+    </Grid>-->
 </UserControl>

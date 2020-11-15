@@ -3,7 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid>
-            
-    </Grid>
+    <ListView ItemsSource="{Binding ServiceList}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Header="날짜" Width="110" DisplayMemberBinding="{Binding Date, StringFormat=yyyy년 M월 d일}"/>
+                <GridViewColumn Header="서비스 품목" Width="auto" DisplayMemberBinding="{Binding Products}"/>
+                <GridViewColumn Header="비고" Width="75" DisplayMemberBinding="{Binding Note}"/>
+            </GridView>
+        </ListView.View>
+    </ListView>
+
 </UserControl>

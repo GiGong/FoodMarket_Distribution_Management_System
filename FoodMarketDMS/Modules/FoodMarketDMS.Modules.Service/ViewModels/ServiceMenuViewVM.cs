@@ -1,16 +1,20 @@
-﻿using Prism.Commands;
+﻿using FoodMarketDMS.Core;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FoodMarketDMS.Modules.Service.ViewModels
 {
     public class ServiceMenuViewVM : BindableBase
     {
-        public ServiceMenuViewVM()
+        private IApplicationCommands _applicationCommands;
+        public IApplicationCommands ApplicationCommands
         {
+            get { return _applicationCommands; }
+            set { SetProperty(ref _applicationCommands, value); }
+        }
 
+        public ServiceMenuViewVM(IApplicationCommands applicationCommands)
+        {
+            ApplicationCommands = applicationCommands;
         }
     }
 }

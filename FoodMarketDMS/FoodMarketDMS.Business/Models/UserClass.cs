@@ -1,17 +1,19 @@
-﻿using System;
+﻿using FoodMarketDMS.Business.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoodMarketDMS.Business.Models
 {
     public class UserClass : BusinessBase, IStringArraySerializable
     {
+        public static string[] PropertyNames { get; } = new string[] { "이름", "생년월일", "핸드폰 번호" };
+
         private readonly static HashSet<long> ID_CHECK = new HashSet<long>();
-        private static uint INDEX = 0;
+        private static long INDEX = 0;
 
         private string _name;
-        private string _phoneNumber;
         private string _brith;
-        private string _address;
+        private string _phoneNumber;
 
         #region Property
 
@@ -23,22 +25,16 @@ namespace FoodMarketDMS.Business.Models
             set { SetProperty(ref _name, value); }
         }
 
-        public string PhoneNumber
-        {
-            get { return _phoneNumber; }
-            set { SetProperty(ref _phoneNumber, value); }
-        }
-
         public string Birth
         {
             get { return _brith; }
             set { SetProperty(ref _brith, value); }
         }
 
-        public string Address
+        public string PhoneNumber
         {
-            get { return _address; }
-            set { SetProperty(ref _address, value); }
+            get { return _phoneNumber; }
+            set { SetProperty(ref _phoneNumber, value); }
         }
 
         #endregion Property
@@ -48,7 +44,7 @@ namespace FoodMarketDMS.Business.Models
         /// <summary>
         /// Constructor for Add User
         /// </summary>
-        public UserClass(string name, string phoneNumber, string birth, string address)
+        public UserClass(string name, string birth, string phoneNumber)
         {
             while (ID_CHECK.Contains(INDEX))
             {
@@ -62,9 +58,8 @@ namespace FoodMarketDMS.Business.Models
             }
 
             Name = name;
-            PhoneNumber = phoneNumber;
             Birth = birth;
-            Address = address;
+            PhoneNumber = phoneNumber;
         }
 
         /// <summary>
@@ -80,9 +75,8 @@ namespace FoodMarketDMS.Business.Models
             }
 
             Name = data[1];
-            PhoneNumber = data[2];
-            Birth = data[3];
-            Address = data[4];
+            Birth = data[2];
+            PhoneNumber = data[3];
         }
 
         #endregion Constructor
@@ -91,7 +85,12 @@ namespace FoodMarketDMS.Business.Models
 
         public string[] ToStringArray()
         {
-            return new string[] { Id.ToString(), Name, PhoneNumber, Birth, Address };
+            return new string[] { Id.ToString(), Name, Birth, PhoneNumber };
+        }
+
+        public string[] ExportStringArray()
+        {
+            return new string[] { Name, Birth, PhoneNumber };
         }
 
         #endregion Method

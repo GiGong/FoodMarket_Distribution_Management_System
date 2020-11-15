@@ -4,6 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-        <Button Content="이용자 목록 불러오기" Command="{Binding ApplicationCommands.LoadUserListCommand}"/>
+        <Button Content="이용자 목록 초기화" Command="{Binding UserModuleCommands.LoadUserListCommand}"/>
+        <Button Content="이용자 추가" Command="{Binding UserModuleCommands.AddUserCommand}"/>
     </StackPanel>
 </UserControl>

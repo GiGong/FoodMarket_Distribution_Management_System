@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -150,18 +152,18 @@ namespace FoodMarketDMS.Services
             throw new NotImplementedException();
         }
 
-        public void SaveToExcel(string[][] data, string path, int indexOfWorksheet)
+        public void SaveToExcel(string[][] data, string path, int indexOfWorksheet, string nameOfWorksheet = null)
         {
             BackgroundWorker worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += SaveExcelData;
             worker.ProgressChanged += Worker_ProgressChanged;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;// Can use BackgroundWorker extension?
+            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
 
             _doneEvent = new AutoResetEvent(false);
             _progressWindow = new ProgressWindow();
 
-            worker.RunWorkerAsync(new ExcelSaveParameter { Path = path, IndexOfWorksheet = indexOfWorksheet, Data = data });
+            worker.RunWorkerAsync(new ExcelSaveParameter { Path = path, IndexOfWorksheet = indexOfWorksheet, NameOfWorksheet = nameOfWorksheet, Data = data });
             _progressWindow.ShowDialog();
 
             _doneEvent.WaitOne();
@@ -177,7 +179,9 @@ namespace FoodMarketDMS.Services
             var param = (ExcelSaveParameter)e.Argument;
             string path = param.Path;
             int indexOfWorksheet = param.IndexOfWorksheet;
+            string nameOfWorksheet = param.NameOfWorksheet;
             var originData = param.Data;
+
             if (originData.Length == 0)
             {
                 _doneEvent.Set();
@@ -193,18 +197,22 @@ namespace FoodMarketDMS.Services
                 excelApp = new Excel.Application();
 
                 // 엑셀 파일 열기
-                wb = excelApp.Workbooks.Add(System.Reflection.Missing.Value);
+                wb = excelApp.Workbooks.Add(Missing.Value);
 
                 worker.ReportProgress(3);
 
-                ws = wb.Worksheets.get_Item(indexOfWorksheet) as Excel.Worksheet;
 
+                ws = (wb.Worksheets.Count < indexOfWorksheet ? wb.Worksheets.Add() : wb.Worksheets[indexOfWorksheet]) as Excel.Worksheet;
+
+
+                if (!string.IsNullOrWhiteSpace(nameOfWorksheet))
+                {
+                    ws.Name = nameOfWorksheet;
+                }
                 worker.ReportProgress(5, "Saving Data...");
 
                 int row = originData.GetLength(0);
-
-                string[] columnNames = originData[0]; // assume 1st row of origin data is column name
-                int column = columnNames.Length;
+                int column = originData[0].Length;
 
                 object[,] data = new object[row, column];
 
@@ -215,13 +223,18 @@ namespace FoodMarketDMS.Services
                         data[r, c] = originData[r][c];
                     }
 
-                    (sender as BackgroundWorker).ReportProgress((int)(((double)r / row) * 100));
+                    (sender as BackgroundWorker).ReportProgress((int)((double)r / row * 100));
                 }
 
-                Excel.Range rng = ws.Range[ws.Cells[1, 1], ws.Cells[row, column]];
-                rng.Value = data;
-                wb.SaveCopyAs(path);
-                wb.Close(SaveChanges: true);
+                //Excel.Range rng = ws.Range[ws.Cells[1, 1], ws.Cells[row, column]];
+                //rng.Value = data;
+
+                Excel.Range rng = ws.get_Range("A1", Missing.Value);
+                rng = rng.get_Resize(row, column);
+                rng.set_Value(Missing.Value, data);
+
+                wb.SaveAs(path);
+                wb.Close();
                 excelApp.Quit();
             }
             catch (Exception ex)
@@ -246,6 +259,120 @@ namespace FoodMarketDMS.Services
             }
         }
 
+        public void SaveToExcel(string[][][] data, string path, string[] namesOfWorksheet = null)
+        {
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += SaveExcelSheets;
+            worker.ProgressChanged += Worker_ProgressChanged;
+            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+
+            _doneEvent = new AutoResetEvent(false);
+            _progressWindow = new ProgressWindow();
+
+            worker.RunWorkerAsync(new ExcelMultiSaveParameter { Path = path, NamesOfWorksheet = namesOfWorksheet.Reverse().ToArray(), Data = data.Reverse().ToArray() });
+            _progressWindow.ShowDialog();
+
+            _doneEvent.WaitOne();
+            KillExcel();
+        }
+
+        private void SaveExcelSheets(object sender, DoWorkEventArgs e)
+        {
+            Excel.Application excelApp = null;
+            Excel.Workbook wb = null;
+            Excel.Worksheet ws = null;
+
+            var param = (ExcelMultiSaveParameter)e.Argument;
+            string path = param.Path;
+            string[] namesOfWorksheet = param.NamesOfWorksheet;
+            string[][][] originData = param.Data;
+
+            if (originData.Length == 0)
+            {
+                _doneEvent.Set();
+                return;
+            }
+
+            var worker = sender as BackgroundWorker;
+
+            try
+            {
+                worker.ReportProgress(0, "Opening Excel...");
+
+                excelApp = new Excel.Application();
+
+                // 엑셀 파일 열기
+                wb = File.Exists(path) ? excelApp.Workbooks.Open(path, ReadOnly: false, Editable: true) : excelApp.Workbooks.Add(Missing.Value);
+
+                worker.ReportProgress(1);
+
+                #region Worksheet
+                for (int i = 0, numOfWorksheet = 1, l = originData.Length; i < l; i++, numOfWorksheet++)
+                {
+                    try
+                    {
+                        ws = wb.Worksheets[namesOfWorksheet[i]];
+                    }
+                    catch (Exception)
+                    {
+                        ws = (wb.Worksheets.Count < numOfWorksheet ? wb.Worksheets.Add() : wb.Worksheets[numOfWorksheet]) as Excel.Worksheet;
+                    }
+
+                    string name = namesOfWorksheet[i];
+                    if (!string.IsNullOrWhiteSpace(name) && ws.Name != name)
+                    {
+                        ws.Name = name;
+                    }
+                    worker.ReportProgress(1, $"Saving Data... {numOfWorksheet} / {l}");
+
+                    int row = originData[i].Length;
+                    int column = originData[i][0].Length;
+
+                    object[,] data = new object[row, column];
+
+                    for (int r = 0; r < row; r++)
+                    {
+                        for (int c = 0; c < column; c++)
+                        {
+                            data[r, c] = originData[i][r][c];
+                        }
+
+                        (sender as BackgroundWorker).ReportProgress((int)((double)r / row * 100));
+                    }
+
+                    Excel.Range rng = ws.get_Range("A1", Missing.Value);
+                    rng = rng.get_Resize(row, column);
+                    rng.set_Value(Missing.Value, data);
+                    rng.Columns.AutoFit();
+                }
+                #endregion Worksheet
+
+                wb.SaveAs(path);
+                wb.Close();
+                excelApp.Quit();
+            }
+            catch (Exception ex)
+            {
+                if (wb != null)
+                {
+                    wb.Close(SaveChanges: false);
+                }
+                if (excelApp != null)
+                {
+                    excelApp.Quit();
+                }
+                throw ex;
+            }
+            finally
+            {
+                // Clean up
+                ReleaseExcelObject(ws);
+                ReleaseExcelObject(wb);
+                ReleaseExcelObject(excelApp);
+                _doneEvent.Set();
+            }
+        }
         private static void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.UserState != null)
@@ -310,7 +437,15 @@ namespace FoodMarketDMS.Services
         {
             public string Path { get; set; }
             public int IndexOfWorksheet { get; set; }
+            public string NameOfWorksheet { get; set; }
             public string[][] Data { get; set; }
+        }
+
+        private struct ExcelMultiSaveParameter
+        {
+            public string Path { get; set; }
+            public string[] NamesOfWorksheet { get; set; }
+            public string[][][] Data { get; set; }
         }
 
         #endregion Parameters

@@ -6,32 +6,32 @@ using FoodMarketDMS.Modules.Service.Views;
 using FoodMarketDMS.Modules.User.Views;
 using FoodMarketDMS.Services.Interfaces;
 using Prism.Commands;
-using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
 using System.ComponentModel;
-using System.IO;
+using System.Threading;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace FoodMarketDMS.ViewModels
 {
     public class MainWindowVM : BindableBase, IWindowLoadedLoader, IClosingWindow
-    {
+    {// 검색기능, 이용자 추가, 이용자 포맷 맞추기, 이용자 정보 변경
+        
         private string _title;
         private string _viewTitle;
 
         private readonly IRegionManager _regionManager;
-        private IApplicationCommands _applicationCommands;
         private readonly IFileService _fileService;
         private readonly IExcelService _excelService;
         private readonly IStateWrapperService _stateWrapperService;
+        private IApplicationCommands _applicationCommands;
 
         private DelegateCommand _saveStateCommand;
         private DelegateCommand _navigateUserListCommand;
         private DelegateCommand _navigateServiceListCommand;
         private DelegateCommand _navigateOfferListCommand;
+        private DelegateCommand _exportToExcelCommand;
 
         public Action Close { get; set; }
 
@@ -66,6 +66,9 @@ namespace FoodMarketDMS.ViewModels
         public DelegateCommand NavigateOfferListCommand =>
             _navigateOfferListCommand ??= new DelegateCommand(ExecuteNavigateOfferListCommand);
 
+        public DelegateCommand ExportToExcelCommand =>
+            _exportToExcelCommand ??= new DelegateCommand(ExecuteExportToExcelCommand);
+
 
         public MainWindowVM(IRegionManager regionManager, IApplicationCommands applicationCommands,
                             IFileService fileService, IExcelService excelService, IStateWrapperService stateWrapperService)
@@ -82,9 +85,16 @@ namespace FoodMarketDMS.ViewModels
 
         public void WindowLoaded()
         {
+            AutoResetEvent _doneEvent = new AutoResetEvent(false);
             BackgroundWorker backgroundWorker = new BackgroundWorker();
-            backgroundWorker.RunAsync((s, e) => _stateWrapperService.LoadState());
+            backgroundWorker.RunAsync(
+                (s, e) =>
+                {
+                    _stateWrapperService.LoadState();
+                    _doneEvent.Set();
+                });
 
+            _doneEvent.WaitOne();
             ExecuteNavigateServiceListCommand();
             ExecuteNavigateOfferListCommand();
             ExecuteNavigateUserListCommand();
@@ -119,6 +129,15 @@ namespace FoodMarketDMS.ViewModels
             ViewTitle = ViewNames.OfferListView;
             _regionManager.RequestNavigate(RegionNames.ContentRegion, nameof(OfferListView));
             _regionManager.RequestNavigate(RegionNames.MenuRegion, nameof(OfferMenuView));
+        }
+
+        private void ExecuteExportToExcelCommand()
+        {
+            string path = _fileService.SaveFilePath(IExcelService.EXCEL_FILE_EXT, Title);
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                _stateWrapperService.ExportToExcel(path, _excelService);
+            }
         }
 
     }

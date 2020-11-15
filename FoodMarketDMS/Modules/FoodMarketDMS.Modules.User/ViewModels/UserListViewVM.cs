@@ -2,10 +2,12 @@
 using FoodMarketDMS.Core;
 using FoodMarketDMS.Core.Events;
 using FoodMarketDMS.Core.Extensions;
+using FoodMarketDMS.Modules.User.Views;
 using FoodMarketDMS.Services.Interfaces;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
+using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -20,11 +22,14 @@ namespace FoodMarketDMS.Modules.User.ViewModels
         private ObservableCollection<UserClass> _userList;
 
         private readonly IEventAggregator _eventAggregator;
+        private readonly IDialogService _dialogService;
         private readonly IStateWrapperService _stateWrapperService;
         private readonly IFileService _fileService;
         private readonly IExcelService _excelService;
 
         private DelegateCommand _loadUserListCommand;
+        private DelegateCommand _addUserCommand;
+        private DelegateCommand<UserClass> _editUserCommand;
 
         public bool IsEnableGrid
         {
@@ -46,28 +51,30 @@ namespace FoodMarketDMS.Modules.User.ViewModels
         public DelegateCommand LoadUserListCommand =>
             _loadUserListCommand ??= new DelegateCommand(ExecuteLoadUserListCommand);
 
+        public DelegateCommand AddUserCommand =>
+            _addUserCommand ??= new DelegateCommand(ExecuteAddUserCommand);
 
-        public UserListViewVM(IEventAggregator eventAggregator,
-            IStateWrapperService stateWrapperService, IApplicationCommands applicationCommands, IFileService fileService, IExcelService excelService)
+        public DelegateCommand<UserClass> EditUserCommand =>
+            _editUserCommand ??= new DelegateCommand<UserClass>(ExecuteEditUserCommand);
+
+        public UserListViewVM(IEventAggregator eventAggregator, IDialogService dialogService,
+            IStateWrapperService stateWrapperService, IUserModuleCommands userModuleCommands, IFileService fileService, IExcelService excelService)
         {
             _eventAggregator = eventAggregator;
+            _dialogService = dialogService;
             _stateWrapperService = stateWrapperService;
             _fileService = fileService;
             _excelService = excelService;
 
-            applicationCommands.LoadUserListCommand.RegisterCommand(LoadUserListCommand);
+            userModuleCommands.LoadUserListCommand.RegisterCommand(LoadUserListCommand);
+            userModuleCommands.AddUserCommand.RegisterCommand(AddUserCommand);
 
             UserList = new ObservableCollection<UserClass>(_stateWrapperService.Users);
         }
 
-        public override void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            
-        }
-
         private void ExecuteLoadUserListCommand()
         {
-            if (MessageBox.Show("이용자 목록을 새로 불러오면\n제공 목록이 초기화됩니다.\n계속 하시겠습니까?",
+            if (MessageBox.Show("이용자 목록을 초기화하면\n제공 목록이 초기화됩니다.\n계속 하시겠습니까?",
                 (string)Application.Current.Resources["Program_Name"], MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No)
                 == MessageBoxResult.No)
             {
@@ -84,7 +91,7 @@ namespace FoodMarketDMS.Modules.User.ViewModels
             List<UserClass> users = new List<UserClass>(excelData.GetLength(0));
             foreach (var item in excelData)
             {
-                users.Add(new UserClass(item[0], item[1], item[2], item[3]));
+                users.Add(new UserClass(item[0], item[1], item[2]));
             }
 
             BackgroundWorker backgroundWorker = new BackgroundWorker();
@@ -95,5 +102,34 @@ namespace FoodMarketDMS.Modules.User.ViewModels
                 _eventAggregator.GetEvent<UserListChanged>().Publish();
             });
         }
+
+        private void ExecuteAddUserCommand()
+        {
+            _dialogService.ShowDialog(nameof(UserEditView), null, 
+                result => 
+                {
+                    if (result.Result != ButtonResult.OK)
+                    {
+                        return;
+                    }
+
+
+                });
+        }
+
+        private void ExecuteEditUserCommand(UserClass user)
+        {
+            _dialogService.ShowDialog(nameof(UserEditView), new DialogParameters { }, 
+                result => 
+                {
+                    if (result.Result != ButtonResult.OK)
+                    {
+                        return;
+                    }
+
+                });
+        }
+
+
     }
 }

@@ -4,6 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-        <!--<Button Content="" Command="{Binding ApplicationCommands.}"/>-->
+        <Button Content="서비스 등록" Command="{Binding ApplicationCommands.RegisterServiceCommand}"/>
+        <Button Content="편집" Command="{Binding ApplicationCommands.EditServiceCommand}"/>
     </StackPanel>
 </UserControl>

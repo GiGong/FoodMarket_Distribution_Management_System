@@ -4,13 +4,15 @@ namespace FoodMarketDMS.Core
 {
     public interface IApplicationCommands
     {
-        CompositeCommand LoadUserListCommand { get; }
         CompositeCommand RegisterOfferCommand { get; }
+        CompositeCommand RegisterServiceCommand { get; }
+        CompositeCommand EditServiceCommand { get; }
     }
 
     public class ApplicationCommands : IApplicationCommands
     {
-        public CompositeCommand LoadUserListCommand { get; } = new CompositeCommand();
         public CompositeCommand RegisterOfferCommand { get; } = new CompositeCommand();
+        public CompositeCommand RegisterServiceCommand { get; } = new CompositeCommand();
+        public CompositeCommand EditServiceCommand { get; } = new CompositeCommand();
     }
 }

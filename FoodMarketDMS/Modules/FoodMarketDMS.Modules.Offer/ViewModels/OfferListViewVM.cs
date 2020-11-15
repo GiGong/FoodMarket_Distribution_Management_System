@@ -125,12 +125,10 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             _dialogService.ShowDialog(nameof(RegisterOfferView), new DialogParameters { { OfferParameters.Users, _stateWrapperService.Users } },
                 (result) =>
                 {
-                    if (result.Result != ButtonResult.OK)
+                    if (result.Result == ButtonResult.OK)
                     {
-                        return;
+                        OfferList.Add(result.Parameters.GetValue<OfferClass>(OfferParameters.NewOffer));
                     }
-
-                    OfferList.Add(result.Parameters.GetValue<OfferClass>(OfferParameters.NewOffer));
                 });
         }
     }

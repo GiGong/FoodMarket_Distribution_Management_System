@@ -17,6 +17,8 @@ namespace FoodMarketDMS.Modules.Service
         {
             containerRegistry.RegisterForNavigation<ServiceListView, ServiceListViewVM>();
             containerRegistry.RegisterForNavigation<ServiceMenuView, ServiceMenuViewVM>();
+
+            containerRegistry.RegisterDialog<ServiceEditView, ServiceEditViewVM>();
         }
     }
 }

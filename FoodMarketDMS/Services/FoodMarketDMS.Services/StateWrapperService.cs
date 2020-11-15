@@ -1,4 +1,5 @@
-﻿using FoodMarketDMS.Business.Models;
+﻿using FoodMarketDMS.Business.Interfaces;
+using FoodMarketDMS.Business.Models;
 using FoodMarketDMS.Services.Interfaces;
 using Microsoft.Office.Interop.Excel;
 using System;
@@ -14,6 +15,10 @@ namespace FoodMarketDMS.Services
 {
     public class StateWrapperService : IStateWrapperService
     {
+        private const string USER_SHEET = "이용자 목록";
+        private const string SERVICE_SHEET = "서비스 목록";
+        private const string OFFER_SHEET = "제공 목록";
+
         public List<UserClass> Users { get; set; } = new List<UserClass>();
         public List<ServiceClass> Services { get; set; } = new List<ServiceClass>();
         public List<OfferClass> Offers { get; set; } = new List<OfferClass>();
@@ -21,9 +26,6 @@ namespace FoodMarketDMS.Services
 
         public async void SaveState()
         {
-//#if DEBUG
-//            Services.Add(new ServiceClass(new DateTime(2020, 10, 1), new List<string> { "토닉워터", "캔커피1", "치즈과자5", "거울", "치약", "냉동닭", "빵", "김", "마스크팩" }));
-//#endif
             string[][][] data = new string[3][][];
             data[0] = new string[Users.Count][];
             data[1] = new string[Services.Count][];
@@ -79,9 +81,10 @@ namespace FoodMarketDMS.Services
             Task taskOffer = new Task(() => LoadOffers(jsonData[2]));
             taskUser.Start();
             taskService.Start();
-            taskOffer.Start();
 
             taskUser.Wait();
+
+            taskOffer.Start();
             taskService.Wait();
             taskOffer.Wait();
         }
@@ -110,6 +113,7 @@ namespace FoodMarketDMS.Services
             {
                 Users.Add(new UserClass(user));
             }
+            Users.Sort((x, y) => x.Name.CompareTo(y.Name));
         }
 
         private void LoadServices(string[][] data)
@@ -118,21 +122,32 @@ namespace FoodMarketDMS.Services
             {
                 Services.Add(new ServiceClass(service));
             }
+            Services.Sort((x, y) => x.Date.CompareTo(y.Date));
         }
 
         private void LoadOffers(string[][] data)
         {
             foreach (string[] offer in data)
             {
-                Offers.Add(new OfferClass(offer));
+                Offers.Add(new OfferClass(offer, Users.Find(user => user.Id == OfferClass.GetUserIdFromStringData(offer))));
             }
+            Offers.Sort((x, y) => x.Date.CompareTo(y.Date));
         }
 
         public void ExportToExcel(string path, IExcelService excelService)
         {
-            //excelService.SaveToExcel(Users, path, 1);
-            //excelService.SaveToExcel(Services, path, 2);
-            //excelService.SaveToExcel(Offers, path, 3);
+            var userData = Users.Select(user => user.ExportStringArray()).ToList();
+            userData.Insert(0, UserClass.PropertyNames);
+
+            var serviceData = Services.Select(service => service.ExportStringArray()).ToList();
+            serviceData.Insert(0, ServiceClass.PropertyNames);
+
+
+            var offerData = Offers.Select(offer => offer.ExportStringArray()).ToList();
+            offerData.Insert(0, OfferClass.PropertyNames);
+
+            string[][][] excelData = new string[3][][] { userData.ToArray(), serviceData.ToArray(), offerData.ToArray() };
+            excelService.SaveToExcel(excelData, path, new string[] { USER_SHEET, SERVICE_SHEET, OFFER_SHEET });
         }
     }
 }

@@ -148,7 +148,7 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             serviceItems?.TrimString();
 
             UserClass offerUser = searchUsers[0];
-            return new DialogParameters { { OfferParameters.NewOffer, new OfferClass(DateTime.Now, offerUser.Id, offerUser.Name, Provider, offerItems, serviceItems) } };
+            return new DialogParameters { { OfferParameters.NewOffer, new OfferClass(DateTime.Now, offerUser, Provider, offerItems, serviceItems) } };
             // if can add unexist user to offer list
             //UserClass offerUser = searchUsers?[0];
             //return new DialogParameters { { OfferParameters.NewOffer, new OfferClass(DateTime.Now, offerUser?.Id ?? -1, offerUser?.Name ?? UserName, Provider, offerItems, serviceItems) } };

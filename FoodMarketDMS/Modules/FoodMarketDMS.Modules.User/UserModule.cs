@@ -1,7 +1,5 @@
 ﻿using FoodMarketDMS.Modules.User.ViewModels;
 using FoodMarketDMS.Modules.User.Views;
-using FoodMarketDMS.Services;
-using FoodMarketDMS.Services.Interfaces;
 using Prism.Ioc;
 using Prism.Modularity;
 
@@ -16,8 +14,12 @@ namespace FoodMarketDMS.Modules.User
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IUserModuleCommands, UserModuleCommands>();
+
             containerRegistry.RegisterForNavigation<UserListView, UserListViewVM>();
             containerRegistry.RegisterForNavigation<UserMenuView, UserMenuViewVM>();
+
+            containerRegistry.RegisterDialog<UserEditView, UserEditViewVM>();
         }
     }
 }
