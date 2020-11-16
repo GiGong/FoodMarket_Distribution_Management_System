@@ -14,6 +14,8 @@ namespace FoodMarketDMS.Modules.Offer
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IOfferModuleCommands, OfferModuleCommands>();
+
             containerRegistry.RegisterForNavigation<OfferListView, OfferListViewVM>();
             containerRegistry.RegisterForNavigation<OfferMenuView, OfferMenuViewVM>();
 

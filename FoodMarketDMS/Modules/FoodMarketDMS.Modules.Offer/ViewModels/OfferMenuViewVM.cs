@@ -9,17 +9,24 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
 {
     public class OfferMenuViewVM : BindableBase
     {
-        private IApplicationCommands _applicationCommands;
+        private readonly IOfferModuleCommands _offerModuleCommands;
 
-        public IApplicationCommands ApplicationCommands
+
+        private DelegateCommand _searchCommand;
+
+
+        public DelegateCommand SearchCommand =>
+            _searchCommand ??= new DelegateCommand(ExecuteSearchCommand);
+
+
+        public OfferMenuViewVM(IOfferModuleCommands offerModuleCommands)
         {
-            get { return _applicationCommands; }
-            set { SetProperty(ref _applicationCommands, value); }
+            _offerModuleCommands = offerModuleCommands;
         }
 
-        public OfferMenuViewVM(IApplicationCommands applicationCommands)
+        private void ExecuteSearchCommand()
         {
-            _applicationCommands = applicationCommands;
+            // TODO: 검색 dialog -> 검색 -> _offerModuleCommands.SearchOfferCommand 에 전달 -> offer list view VM에서 search 실행 -> selected item 에 반영
         }
     }
 }

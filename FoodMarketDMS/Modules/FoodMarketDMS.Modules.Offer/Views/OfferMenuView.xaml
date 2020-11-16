@@ -4,7 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-        <Button Content="필터"/>
-        <Button Content="최근값 찾기 -?-"/>
+        <!--<Button Content="필터"/>-->
+        <Button Content="검색" IsEnabled="False" Command="{Binding SearchCommand}"/>
     </StackPanel>
 </UserControl>

@@ -82,7 +82,7 @@
             <TextBlock HorizontalAlignment="Left" Margin="470,0,0,0" Text="{Binding TodayUser, StringFormat={}{0}명}"/>
         </Grid>
 
-        <ListView Grid.Row="2" ItemsSource="{Binding OfferList}">
+        <ListView Grid.Row="2" ItemsSource="{Binding OfferList}" SelectedItem="{Binding SelectedOffer}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <ListView ItemsSource="{Binding ServiceList}">
+    <ListView ItemsSource="{Binding ServiceList}" SelectedItem="{Binding SelectedService}">
         <ListView.View>
             <GridView>
                 <GridViewColumn Header="날짜" Width="110" DisplayMemberBinding="{Binding Date, StringFormat=yyyy년 M월 d일}"/>

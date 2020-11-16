@@ -113,13 +113,16 @@ namespace FoodMarketDMS.Modules.User.ViewModels
                         return;
                     }
 
-
+                    var resultUser = result.Parameters.GetValue<UserClass>(UserParameters.RESULT_USER);
+                    UserList.Add(resultUser);
+                    _stateWrapperService.Users.Add(resultUser);
                 });
         }
 
         private void ExecuteEditUserCommand(UserClass user)
         {
-            _dialogService.ShowDialog(nameof(UserEditView), new DialogParameters { }, 
+            int index = UserList.IndexOf(user);
+            _dialogService.ShowDialog(nameof(UserEditView), new DialogParameters { { UserParameters.CURRENT_USER, user} }, 
                 result => 
                 {
                     if (result.Result != ButtonResult.OK)
@@ -127,6 +130,9 @@ namespace FoodMarketDMS.Modules.User.ViewModels
                         return;
                     }
 
+                    var resultUser = result.Parameters.GetValue<UserClass>(UserParameters.RESULT_USER);
+                    UserList[index] = resultUser;
+                    _stateWrapperService.Users[index] = resultUser;
                 });
         }
 

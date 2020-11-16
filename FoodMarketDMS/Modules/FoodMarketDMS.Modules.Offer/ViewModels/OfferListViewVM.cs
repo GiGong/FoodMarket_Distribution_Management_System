@@ -22,12 +22,15 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
 
         private double _usageRate;
         private int _todayUser;
+        private OfferClass _selectedOffer;
         private ObservableCollection<OfferClass> _offerList;
 
         private readonly IDialogService _dialogService;
         private readonly IStateWrapperService _stateWrapperService;
 
+
         private DelegateCommand _registerOfferCommand;
+        private DelegateCommand<string> _searchOfferCommand;
 
 
         public double UsageRate
@@ -49,6 +52,12 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             }
         }
 
+        public OfferClass SelectedOffer
+        {
+            get { return _selectedOffer; }
+            set { SetProperty(ref _selectedOffer, value); }
+        }
+
         public ObservableCollection<OfferClass> OfferList
         {
             get { return _offerList; }
@@ -57,6 +66,9 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
 
         public DelegateCommand RegisterOfferCommand =>
             _registerOfferCommand ??= new DelegateCommand(ExecuteRegisterOfferCommand);
+
+        public DelegateCommand<string> SearchOfferCommand =>
+            _searchOfferCommand ??= new DelegateCommand<string>(ExecuteSearchOfferCommand);
 
 
         public OfferListViewVM(IDialogService dialogService, IEventAggregator eventAggregator, IApplicationCommands applicationCommands,
@@ -68,6 +80,7 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
             eventAggregator.GetEvent<UserCountChanged>().Subscribe(UserCount_Changed);
             eventAggregator.GetEvent<UserListChanged>().Subscribe(UserList_Changed);
             applicationCommands.RegisterOfferCommand.RegisterCommand(RegisterOfferCommand);
+
 
             OfferList = new ObservableCollection<OfferClass>(_stateWrapperService.Offers);
             OfferList.CollectionChanged += OfferList_CollectionChanged;
@@ -131,5 +144,11 @@ namespace FoodMarketDMS.Modules.Offer.ViewModels
                     }
                 });
         }
+
+        private void ExecuteSearchOfferCommand(string name)
+        {
+
+        }
+
     }
 }

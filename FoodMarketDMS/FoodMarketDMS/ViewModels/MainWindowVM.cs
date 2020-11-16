@@ -16,7 +16,7 @@ using System.Windows;
 namespace FoodMarketDMS.ViewModels
 {
     public class MainWindowVM : BindableBase, IWindowLoadedLoader, IClosingWindow
-    {// 검색기능, 이용자 추가, 이용자 포맷 맞추기, 이용자 정보 변경
+    {// 검색기능, 이용자 포맷 맞추기
         
         private string _title;
         private string _viewTitle;

@@ -55,17 +55,6 @@
             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Provider}"
                      Height="22" VerticalContentAlignment="Center"/>
 
-            <ListView Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0"
-                      SelectionMode="Single"
-                      ItemsSource="{Binding UserSearchList}" SelectedItem="{Binding SelectedUser}" IsEnabled="{Binding IsSearchExist}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="이용자 성함" Width="75" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="생년월일" Width="85" DisplayMemberBinding="{Binding Birth}"/>
-                        <GridViewColumn Header="핸드폰 번호" Width="90" DisplayMemberBinding="{Binding PhoneNumber}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
 
             <Label Grid.Row="3">물품</Label>
             <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,3"
@@ -75,6 +64,19 @@
             <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,3"
                      AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                      Text="{Binding TextServiceItems}"/>
+
+            <!-- temporarily position for listviewitem tab index -->
+            <ListView Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0"
+                      SelectionMode="Single" IsTabStop="False"
+                      ItemsSource="{Binding UserSearchList}" SelectedItem="{Binding SelectedUser}" IsEnabled="{Binding IsSearchExist}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="이용자 성함" Width="75" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="생년월일" Width="85" DisplayMemberBinding="{Binding Birth}"/>
+                        <GridViewColumn Header="핸드폰 번호" Width="90" DisplayMemberBinding="{Binding PhoneNumber}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
         </Grid>
 

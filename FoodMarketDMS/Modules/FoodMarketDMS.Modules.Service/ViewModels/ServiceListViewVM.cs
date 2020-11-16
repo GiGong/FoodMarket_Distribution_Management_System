@@ -14,13 +14,21 @@ namespace FoodMarketDMS.Modules.Service.ViewModels
 {
     public class ServiceListViewVM : BindableBase
     {
-
+        private ServiceClass _selectedService;
         private ObservableCollection<ServiceClass> _serviceList;
+
         private readonly IDialogService _dialogService;
         private readonly IStateWrapperService _stateWrapperService;
 
         private DelegateCommand _registerServiceCommand;
-        private DelegateCommand<ServiceClass> _editServiceCommand;
+        private DelegateCommand _editServiceCommand;
+
+
+        public ServiceClass SelectedService
+        {
+            get { return _selectedService; }
+            set { SetProperty(ref _selectedService, value); }
+        }
 
         public ObservableCollection<ServiceClass> ServiceList
         {
@@ -31,8 +39,8 @@ namespace FoodMarketDMS.Modules.Service.ViewModels
         public DelegateCommand RegisterServiceCommand =>
             _registerServiceCommand ??= new DelegateCommand(ExecuteRegisterServiceCommand);
 
-        public DelegateCommand<ServiceClass> EditServiceCommand =>
-            _editServiceCommand ??= new DelegateCommand<ServiceClass>(ExecuteEditServiceCommand);
+        public DelegateCommand EditServiceCommand =>
+            _editServiceCommand ??= new DelegateCommand(ExecuteEditServiceCommand, CanExecuteEditServiceCommand).ObservesProperty(() => SelectedService);
 
         public ServiceListViewVM(IDialogService dialogService, IApplicationCommands applicationCommands, IStateWrapperService stateWrapperService)
         {
@@ -80,10 +88,15 @@ namespace FoodMarketDMS.Modules.Service.ViewModels
                 });
         }
 
-        private void ExecuteEditServiceCommand(ServiceClass currentService)
+        private bool CanExecuteEditServiceCommand()
         {
-            int index = ServiceList.IndexOf(currentService);
-            _dialogService.ShowDialog(nameof(ServiceEditView), new DialogParameters { { ServiceParameters.CURRENT_SERVICE, currentService } },
+            return !(SelectedService is null);
+        }
+
+        private void ExecuteEditServiceCommand()
+        {
+            int index = ServiceList.IndexOf(SelectedService);
+            _dialogService.ShowDialog(nameof(ServiceEditView), new DialogParameters { { ServiceParameters.CURRENT_SERVICE, SelectedService } },
             (result) =>
             {
                 if (result.Result == ButtonResult.OK)
