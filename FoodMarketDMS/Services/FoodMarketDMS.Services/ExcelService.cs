@@ -417,12 +417,17 @@ namespace FoodMarketDMS.Services
             Process[] allProcesses = Process.GetProcessesByName("excel");
             int currPsId = Process.GetCurrentProcess().Id;
 
-            // check to kill the child excel process
-            foreach (Process ExcelProcess in allProcesses)
+            try
             {
-                if (ExcelProcess.Parent().Id == currPsId)
-                    ExcelProcess.Kill();
+                // check to kill the child excel process
+                foreach (Process ExcelProcess in allProcesses)
+                {
+                    if (ExcelProcess.Parent().Id == currPsId)
+                        ExcelProcess.Kill();
+                }
             }
+            catch (Exception)
+            { }
         }
 
         #region Parameters

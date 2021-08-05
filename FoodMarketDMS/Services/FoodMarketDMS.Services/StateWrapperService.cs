@@ -98,9 +98,9 @@ namespace FoodMarketDMS.Services
             }
             catch (FileNotFoundException e)
             {
-#if DEBUG
+
                 MessageBox.Show(e.Message);
-#endif
+
                 return null;
             }
 

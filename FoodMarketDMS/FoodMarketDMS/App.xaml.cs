@@ -22,6 +22,10 @@ namespace FoodMarketDMS
     {
         protected override Window CreateShell()
         {
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             return Container.Resolve<MainWindow>();
         }
 
@@ -56,5 +60,24 @@ namespace FoodMarketDMS
                 return Type.GetType(viewModelName);
             });
         }
+
+        #region Custom Exception Handler
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show("In UnhandledException" + Environment.NewLine + ((Exception)e.ExceptionObject).Message);
+
+            throw (Exception)e.ExceptionObject;
+
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show("In DispatcherUnhandledException" + Environment.NewLine + e.Exception.Message);
+
+            throw e.Exception;
+        }
+
+        #endregion Custom Exception Handler
     }
 }
